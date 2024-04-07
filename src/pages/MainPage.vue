@@ -16,7 +16,7 @@ export default {
   //   fetch('http://localhost:8081/api/v1/category')
   //       .then(response => response.json())
   //       .then(data => {
-  //         this.categories = data
+  //         this.courses = data
   //       })
   //
   // },
@@ -103,11 +103,11 @@ export default {
              :key="category"
         >
           <h2 class="text-light-emphasis mb-3"> {{ category }}</h2>
-          <plain-card :data="courses" :key="category"/>
+          <plain-card :objects="courses" :key="category"/>
         </div>
       </div>
       <div class="col-2">
-        <search-panel :data="courses"></search-panel>
+        <search-panel></search-panel>
       </div>
     </div>
     <Footer></Footer>

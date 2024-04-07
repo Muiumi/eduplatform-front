@@ -1,7 +1,5 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
-import MainPage from "@/views/MainPage.vue";
-
 
 Vue.use(VueRouter)
 
@@ -9,7 +7,27 @@ const routes = [
     {
         path: '/',
         name: 'MainPage',
-        component: () => import('@/views/MainPage.vue')
+        component: () => import("@/pages/MainPage.vue")
+    },
+    {
+        path: '/courses/:courseId',
+        name: 'CoursePage',
+        component: () => import("@/pages/CoursePage.vue")
+    },
+    {
+        path: '/lessons',
+        name: 'LessonPage',
+        component: () => import("@/pages/LessonPage.vue")
+    },
+    {
+        path: '/auth',
+        name: 'AuthPage',
+        component: () => import("@/pages/AuthPage.vue")
+    },
+    {
+        path: '/register',
+        name: 'RegistrationPage',
+        component: () => import("@/pages/RegistrationPage.vue")
     },
 ]
 

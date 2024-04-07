@@ -1,18 +1,11 @@
 <script>
 export default {
   name: "SearchPanel",
-  props: ['objectsToSearch'],
   data() {
     return {
-      requestedObject: '',
     }
 
   },
-  computed: {
-    searchResults() {
-      return this.objectsToSearch.filter(item => item.title.toLowerCase().includes(this.requestedObject.toLowerCase()));
-    }
-  }
 }
 
 </script>
@@ -24,12 +17,8 @@ export default {
       <label for="exampleFormControlInput1" class="form-label text-uppercase fs-2 fw-semibold">Поиск</label>
       <div class="card">
         <div class="m-3">
-          <input type="text" class="form-control mb-3" id="exampleFormControlInput1" placeholder="Искомый объект"
-                 :value="this.requestedObject"
-                 @input="this.requestedObject = $event.target.value"
-          >
+          <input type="text" class="form-control mb-3" id="exampleFormControlInput1" placeholder="Искомый объект">
           <button type="button" class="btn btn-success">Найти</button>
-          <!--          Совпадений {{ searchResults.length }} из {{ this.objectsToSearch.length }}-->
         </div>
       </div>
     </div>
