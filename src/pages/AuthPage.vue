@@ -2,13 +2,56 @@
 import SearchPanel from "@/components/SearchPanel.vue";
 import Header from "@/components/Header.vue";
 import Footer from "@/components/Footer.vue";
-import RegistrationPage from "@/pages/RegistrationPage.vue";
+import {globalStorage} from "@/globalStorage";
 
 export default {
   name: "AuthPage",
-  computed: {
-    RegistrationPage() {
-      return RegistrationPage
+  data() {
+    return {
+      user: {
+        email: "",
+        password: "",
+      },
+    }
+  },
+  methods: {
+    login() {
+      const signInRequest = {
+        email: this.user.email,
+        password: this.user.password,
+      }
+      fetch(`${this.$eduPlatformApi}/auth/signIn`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(signInRequest),
+      })
+          .then(response => {
+            let accessToken = response.headers.get("Authorization");
+            localStorage.setItem("jwtToken", `${accessToken}`);
+            return response.json();
+          })
+          .then(responseContent => {
+            this.parseAuthResponse(responseContent);
+            console.info(`Пользователь ${this.user.email} авторизовался.`);
+            setTimeout(() => {
+              this.$router.push("/");
+            }, 3000);
+          })
+          .catch(exception => {
+                console.error(`Ошибка при авторизации пользователя: ${exception}`);
+                // TODO сделать уведомление для пользователя?
+              }
+          )
+    },
+    parseAuthResponse(content) {
+      let user = globalStorage.currenUser;
+      user.setEmail(content.email);
+      user.setFirstName(content.first_name);
+      user.setSurname(content.surname);
+      user.setRole(content.role);
+      localStorage.setItem("refreshToken", `${content.refresh_token}`);
     }
   },
   components: {Footer, Header, SearchPanel},
@@ -23,33 +66,33 @@ export default {
       <div class="col-sm-5">
         <div class="container-sm rounded-3 p-3 m-3 bg-light bg-opacity-25">
           <h2 class="mb-4">Авторизация</h2>
-          <div class="row g-2 m-3 justify-content-center ">
+          <div class="row g-2 m-3 justify-content-center">
             <div class="row mb-3 justify-content-center fw-bold">
-              <div class="col-lg-2">
+              <div class="col-sm-2">
                 <label for="emailInput" class="col-form-label">Email:</label>
               </div>
-              <div class="col-lg-8">
-                <input type="email" id="emailInput" class="form-control" aria-describedby="emailHelpInline">
+              <div class="col-sm-8">
+                <input type="email" id="emailInput" class="form-control" aria-describedby="emailHelpInline"
+                       v-model="user.email">
               </div>
             </div>
             <div class="row mb-3 justify-content-center fw-bold">
-              <div class="col-lg-2">
+              <div class="col-sm-2">
                 <label for="passwordInput" class="col-form-label">Пароль:</label>
               </div>
-              <div class="col-lg-8">
-                <input type="password" id="passwordInput" class="form-control" aria-describedby="passwordHelpInline">
+              <div class="col-sm-8">
+                <input type="password" id="passwordInput" class="form-control" aria-describedby="passwordHelpInline"
+                       v-model="user.password">
               </div>
             </div>
             <div class="row mt-3">
-              <button type="button" class="btn btn-primary">Войти</button>
+              <button type="button" class="btn btn-primary" @click="login">Войти</button>
             </div>
             <p class="small mt-2 pt-1 mb-0">
               Нет аккаунта?
               <a class="link-danger" @click="$router.push('/register')">Зарегистрироваться</a>
             </p>
           </div>
-
-
         </div>
       </div>
     </div>
