@@ -32,8 +32,9 @@ export default {
           .then(response => {
                 response.json();
                 setTimeout(() => {
-                  this.$router.back();
-                }, 3000)
+                  this.$router.push("/auth");
+                }, 3000);
+                console.log(`Пользователь ${this.user.email} зарегистрировался в системе.`)
                 // TODO сделать уведомление для пользователя?
               }
           )

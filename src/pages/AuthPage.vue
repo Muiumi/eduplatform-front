@@ -27,11 +27,7 @@ export default {
         },
         body: JSON.stringify(signInRequest),
       })
-          .then(response => {
-            let accessToken = response.headers.get("Authorization");
-            localStorage.setItem("jwtToken", `${accessToken}`);
-            return response.json();
-          })
+          .then(response => response.json())
           .then(responseContent => {
             this.parseAuthResponse(responseContent);
             console.info(`Пользователь ${this.user.email} авторизовался.`);
@@ -51,7 +47,12 @@ export default {
       user.setFirstName(content.first_name);
       user.setSurname(content.surname);
       user.setRole(content.role);
-      localStorage.setItem("refreshToken", `${content.refresh_token}`);
+
+      const expDateAccess = new Date(content.access_expiration);
+      const refreshDateAccess = new Date(content.refresh_expiration);
+
+      this.$cookies.set("accessToken", `${content.access_token}`, expDateAccess);
+      this.$cookies.set("refreshToken", `${content.refresh_token}`, refreshDateAccess);
     }
   },
   components: {Footer, Header, SearchPanel},
