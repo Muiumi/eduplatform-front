@@ -9,10 +9,10 @@ import {globalStorage} from "@/globalStorage";
 
 const eduPlatformApi = process.env.VUE_APP_EDU_PLATFORM_API_URL;
 Vue.prototype.$eduPlatformApi = eduPlatformApi;
+Vue.prototype.$globalStorage = globalStorage;
 
 new Vue({
   router,
-  globalStorage,
   render: function (h) { return h(App) }
 }).$mount('#app');
 Vue.use(VueCookies);

@@ -15,7 +15,7 @@ const routes = [
         component: () => import("@/pages/CoursePage.vue")
     },
     {
-        path: '/lessons',
+        path: '/lessons/:lessonId',
         name: 'LessonPage',
         component: () => import("@/pages/LessonPage.vue")
     },

@@ -33,13 +33,14 @@ export default {
     return {
       categories: [],
       courses: [],
-      isCategoryChosen: false
+      filteredCourses: [],
+      isCategoryChosen: false,
     }
   },
   methods: {
     showCategoryCourses(categoryId) {
-      this.isCategoryChosen = false;
-      this.courses = [];
+      // this.isCategoryChosen = false;
+      // this.courses = [];
 
       fetch(`${this.$eduPlatformApi}/category/${categoryId}`, {
         method: "GET",
@@ -58,6 +59,9 @@ export default {
                   }
               )
           )
+    },
+    findCourse(searchItem) {
+      this.filteredCourses = this.courses.filter(course => course.title.toLowerCase().includes(searchItem.toLowerCase()));
     }
   },
 }
@@ -84,14 +88,14 @@ export default {
           </div>
         </div>
         <div class="container-sm rounded-3 p-3 mt-3 bg-light bg-opacity-25" v-show="isCategoryChosen">
-          <plain-card v-for="(course, index) in courses"
+          <plain-card v-for="(course, index) in filteredCourses"
                       :key="index" :object="course"
           >
           </plain-card>
         </div>
       </div>
       <div class="col-2">
-        <search-panel></search-panel>
+        <search-panel @search="findCourse"></search-panel>
       </div>
     </div>
     <Footer></Footer>

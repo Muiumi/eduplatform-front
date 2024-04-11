@@ -1,11 +1,10 @@
 <script>
-import SearchPanel from "@/components/SearchPanel.vue";
 import Header from "@/components/Header.vue";
 import Footer from "@/components/Footer.vue";
-import {globalStorage} from "@/globalStorage";
 
 export default {
   name: "AuthPage",
+  components: {Footer, Header},
   data() {
     return {
       user: {
@@ -42,7 +41,7 @@ export default {
           )
     },
     parseAuthResponse(content) {
-      let user = globalStorage.currenUser;
+      let user = this.$globalStorage.currentUser;
       user.setEmail(content.email);
       user.setFirstName(content.first_name);
       user.setSurname(content.surname);
@@ -55,7 +54,6 @@ export default {
       this.$cookies.set("refreshToken", `${content.refresh_token}`, refreshDateAccess);
     }
   },
-  components: {Footer, Header, SearchPanel},
 }
 
 </script>

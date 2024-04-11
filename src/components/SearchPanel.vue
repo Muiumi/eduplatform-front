@@ -3,8 +3,14 @@ export default {
   name: "SearchPanel",
   data() {
     return {
+      objectToSearch: ''
     }
 
+  },
+  computed: {
+    searchResults() {
+      return this.$emit("search", this.objectToSearch);
+    }
   },
 }
 
@@ -17,8 +23,8 @@ export default {
       <label for="exampleFormControlInput1" class="form-label text-uppercase fs-2 fw-semibold">Поиск</label>
       <div class="card">
         <div class="m-3">
-          <input type="text" class="form-control mb-3" id="exampleFormControlInput1" placeholder="Искомый объект">
-          <button type="button" class="btn btn-success">Найти</button>
+          <input type="text" class="form-control mb-3" id="exampleFormControlInput1" placeholder="Искомый объект"
+                 v-model="objectToSearch" @input="searchResults">
         </div>
       </div>
     </div>

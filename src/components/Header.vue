@@ -1,11 +1,16 @@
 <script>
-import {globalStorage} from "@/globalStorage";
-
 export default {
   name: "Header",
+  methods: {
+    goToMain() {
+      if (this.$route.name !== "MainPage") {
+        this.$router.push('/');
+      }
+    }
+  },
   computed: {
     getUserFullName() {
-      return `${globalStorage.currenUser.surname} ${globalStorage.currenUser.firstName}`;
+      return `${this.$globalStorage.currentUser.surname} ${this.$globalStorage.currentUser.firstName}`;
     }
   },
 }
@@ -16,7 +21,7 @@ export default {
   <header>
     <nav class="navbar navbar-expand-md mb-2">
       <div class="container-fluid">
-        <a class="navbar-brand text-light fs-3" href="#">
+        <a href="#" class="navbar-brand text-light fs-3 stretched-link" @click="goToMain">
           <img src="../assets/logo.png" width="50rem" height="50rem" alt="EduPlatform">
           Образовательная платформа
         </a>
@@ -29,6 +34,9 @@ export default {
   </header>
 </template>
 
-<style scoped>
+<style>
+.stretched-link {
+  position: relative;
+}
 
 </style>

@@ -8,12 +8,16 @@ export default {
   components: {Footer, PlainCard, Header},
   data() {
     return {
-      currentCourseId: this.$route.params.courseId,
       lessons: []
     }
   },
+  computed: {
+    currentCourse() {
+      return this.$globalStorage.currentCourse;
+    }
+  },
   mounted() {
-    fetch(`${this.$eduPlatformApi}/courses/lessons/${this.currentCourseId}`, {
+    fetch(`${this.$eduPlatformApi}/courses/lessons/${this.currentCourse.id}`, {
       method: "GET",
       headers: {
         "Authorization": `Bearer ${this.$cookies.get("accessToken")}`,
@@ -27,7 +31,7 @@ export default {
               console.error(`Ошибка при получении данных: ${exception}`);
               // TODO сделать уведомление для пользователя?
             })
-        )
+        );
   }
 
 
@@ -40,11 +44,12 @@ export default {
     <div class="row justify-content-center">
       <div class="col-6">
         <div class="container-sm rounded-3 p-3 mb-3 bg-light bg-opacity-25">
-          <h2 class="text-light-emphasis mb-3">Название курса {{ this.currentCourseId }}</h2>
-          <div v-for="(lesson, index) in lessons">
-            <p>{{ lesson.title }}</p>
-            <p>{{ lesson.description }}</p>
-          </div>
+          <h2 class="text-light-emphasis mb-3"> {{ currentCourse.title }}</h2>
+          <plain-card v-for="(lesson, index) in lessons"
+                      :key="index"
+                      :object="lesson"
+          >
+          </plain-card>
 
         </div>
       </div>
