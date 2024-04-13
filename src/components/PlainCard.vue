@@ -37,7 +37,6 @@ export default {
   },
   computed: {
     isCardForCourse() {
-      console.log("Проверка");
       return "category" in this.object;
     }
   }

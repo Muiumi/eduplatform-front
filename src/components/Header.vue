@@ -10,7 +10,7 @@ export default {
   },
   computed: {
     getUserFullName() {
-      return `${this.$globalStorage.currentUser.surname} ${this.$globalStorage.currentUser.firstName}`;
+      return `${this.$globalStorage.currentUser.lastName} ${this.$globalStorage.currentUser.firstName}`;
     }
   },
 }

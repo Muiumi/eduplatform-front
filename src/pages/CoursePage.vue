@@ -24,8 +24,8 @@ export default {
       },
     })
         .then(response => response.json())
-        .then(data => {
-          this.lessons = data;
+        .then(responseContent => {
+          this.lessons = responseContent;
         })
         .catch((exception => {
               console.error(`Ошибка при получении данных: ${exception}`);

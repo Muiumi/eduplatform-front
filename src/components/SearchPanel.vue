@@ -24,8 +24,9 @@ export default {
       <div class="card">
         <div class="m-3">
           <input type="text" class="form-control mb-3" id="exampleFormControlInput1" placeholder="Искомый объект"
-                 v-model="objectToSearch" @input="searchResults">
+                 v-model="objectToSearch">
         </div>
+        <button class="button" @click="searchResults" hidden="hidden"> Поиск</button>
       </div>
     </div>
   </div>

@@ -1,7 +1,10 @@
 'use strict';
 import Vue from 'vue';
+import {BootstrapVue} from "bootstrap-vue";
 import App from './App.vue';
 import router from './router';
+import 'bootstrap/dist/css/bootstrap.css'
+import 'bootstrap-vue/dist/bootstrap-vue.css'
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import VueCookies from 'vue-cookies';
@@ -12,7 +15,11 @@ Vue.prototype.$eduPlatformApi = eduPlatformApi;
 Vue.prototype.$globalStorage = globalStorage;
 
 new Vue({
-  router,
-  render: function (h) { return h(App) }
+    router,
+    render: function (h) {
+        return h(App)
+    }
 }).$mount('#app');
+Vue.use(BootstrapVue);
 Vue.use(VueCookies);
+

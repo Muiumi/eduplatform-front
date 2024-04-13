@@ -8,7 +8,7 @@ export default {
     return {
       user: {
         firstName: "",
-        surname: "",
+        lastName: "",
         email: "",
         password: "",
       },
@@ -17,8 +17,8 @@ export default {
   methods: {
     register() {
       const signUpRequest = {
-        first_name: this.user.firstName,
-        last_name: this.user.surname,
+        firstName: this.user.firstName,
+        last_name: this.user.lastName,
         email: this.user.email,
         password: this.user.password,
       }

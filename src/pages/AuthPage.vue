@@ -43,15 +43,15 @@ export default {
     parseAuthResponse(content) {
       let user = this.$globalStorage.currentUser;
       user.setEmail(content.email);
-      user.setFirstName(content.first_name);
-      user.setSurname(content.surname);
+      user.setFirstName(content.firstName);
+      user.setLastName(content.lastName);
       user.setRole(content.role);
 
-      const expDateAccess = new Date(content.access_expiration);
-      const refreshDateAccess = new Date(content.refresh_expiration);
+      const expDateAccess = new Date(content.accessExpiration);
+      const refreshDateAccess = new Date(content.refreshExpiration);
 
-      this.$cookies.set("accessToken", `${content.access_token}`, expDateAccess);
-      this.$cookies.set("refreshToken", `${content.refresh_token}`, refreshDateAccess);
+      this.$cookies.set("accessToken", `${content.accessToken}`, expDateAccess);
+      this.$cookies.set("refreshToken", `${content.refreshToken}`, refreshDateAccess);
     }
   },
 }

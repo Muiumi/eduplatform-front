@@ -3,15 +3,15 @@ import {reactive} from 'vue';
 export const globalStorage = reactive({
         currentUser: {
             firstName: "",
-            surname: "",
+            lastName: "",
             email: "",
             role: "",
 
             setFirstName(name) {
                 this.firstName = name;
             },
-            setSurname(surname) {
-                this.surname = surname;
+            setLastName(lastName) {
+                this.lastName = lastName;
             },
             setEmail(email) {
                 this.email = email;
