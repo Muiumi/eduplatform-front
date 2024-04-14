@@ -16,7 +16,7 @@ export default {
     fetch(`${this.$eduPlatformApi}/category`, {
       method: "GET",
       headers: {
-        "Authorization": `Bearer ${this.$cookies.get("accessToken")}`,
+        "Authorization": `Bearer ${this.currentUser.accessToken}`,
       },
     })
         .then(response => response.json())
@@ -25,7 +25,9 @@ export default {
         })
         .catch(exception => {
               console.error(`Ошибка при получении данных: ${exception}`);
-              // TODO сделать уведомление для пользователя?
+              this.$bvToast.toast("Произошла ошибка при получении данных с сервера.", {
+                variant: "danger"
+              })
             }
         )
   },
@@ -39,13 +41,10 @@ export default {
   },
   methods: {
     showCategoryCourses(categoryId) {
-      // this.isCategoryChosen = false;
-      // this.courses = [];
-
       fetch(`${this.$eduPlatformApi}/category/${categoryId}`, {
         method: "GET",
         headers: {
-          "Authorization": `Bearer ${this.$cookies.get("accessToken")}`,
+          "Authorization": `Bearer ${this.currentUser.accessToken}`,
         },
       })
           .then(response => response.json())
@@ -55,13 +54,20 @@ export default {
           })
           .catch((exception => {
                     console.error(`Ошибка при получении данных: ${exception}`);
-                    // TODO сделать уведомление для пользователя?
+                    this.$bvToast.toast("Произошла ошибка при получении данных с сервера.", {
+                      variant: "danger"
+                    })
                   }
               )
           )
     },
     findCourse(searchItem) {
       this.filteredCourses = this.courses.filter(course => course.title.toLowerCase().includes(searchItem.toLowerCase()));
+    }
+  },
+  computed: {
+    currentUser() {
+      return this.$globalStorage.currentUser;
     }
   },
 }
@@ -78,7 +84,7 @@ export default {
             <label class="form-label text-uppercase fs-2 fw-semibold">Категории платформы</label>
           </div>
           <div class="container text-center">
-            <div class="row row-cols-4 gap-3 justify-content-center">
+            <div class="row row-cols-lg-4 gap-3 justify-content-center">
               <button class="btn btn-primary" type="button"
                       v-for="(category, index) in categories"
                       :key="index" @click="showCategoryCourses(index+1)">

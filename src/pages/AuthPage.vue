@@ -26,32 +26,39 @@ export default {
         },
         body: JSON.stringify(signInRequest),
       })
-          .then(response => response.json())
+          .then(response => {
+            if (!response.ok) {
+              throw new Error("Нет пользователя с таким паролем и email");
+            }
+            console.info(`Пользователь ${this.user.email} авторизовался.`);
+            return response.json();
+          })
           .then(responseContent => {
             this.parseAuthResponse(responseContent);
-            console.info(`Пользователь ${this.user.email} авторизовался.`);
+            this.$bvToast.toast("Вы успешно авторизовались", {
+              variant: "success"
+            });
             setTimeout(() => {
               this.$router.push("/");
             }, 3000);
           })
           .catch(exception => {
+                this.$bvToast.toast("Неверные почта или пароль, проверьте вводимые данные и попробуйте снова.", {
+                  variant: "danger"
+                })
                 console.error(`Ошибка при авторизации пользователя: ${exception}`);
-                // TODO сделать уведомление для пользователя?
               }
           )
     },
     parseAuthResponse(content) {
       let user = this.$globalStorage.currentUser;
-      user.setEmail(content.email);
-      user.setFirstName(content.firstName);
-      user.setLastName(content.lastName);
-      user.setRole(content.role);
+      Object.assign(user, content);
+      localStorage.setItem("userData", JSON.stringify(user));
 
       const expDateAccess = new Date(content.accessExpiration);
-      const refreshDateAccess = new Date(content.refreshExpiration);
-
+      const expDateRefresh = new Date(content.refreshExpiration);
       this.$cookies.set("accessToken", `${content.accessToken}`, expDateAccess);
-      this.$cookies.set("refreshToken", `${content.refreshToken}`, refreshDateAccess);
+      this.$cookies.set("refreshToken", `${content.refreshToken}`, expDateRefresh);
     }
   },
 }
@@ -67,19 +74,19 @@ export default {
           <h2 class="mb-4">Авторизация</h2>
           <div class="row g-2 m-3 justify-content-center">
             <div class="row mb-3 justify-content-center fw-bold">
-              <div class="col-sm-2">
+              <div class="col-xxl-2">
                 <label for="emailInput" class="col-form-label">Email:</label>
               </div>
-              <div class="col-sm-8">
+              <div class="col-xxl-8">
                 <input type="email" id="emailInput" class="form-control" aria-describedby="emailHelpInline"
                        v-model="user.email">
               </div>
             </div>
             <div class="row mb-3 justify-content-center fw-bold">
-              <div class="col-sm-2">
+              <div class="col-xxl-2">
                 <label for="passwordInput" class="col-form-label">Пароль:</label>
               </div>
-              <div class="col-sm-8">
+              <div class="col-xxl-8">
                 <input type="password" id="passwordInput" class="form-control" aria-describedby="passwordHelpInline"
                        v-model="user.password">
               </div>
@@ -89,7 +96,7 @@ export default {
             </div>
             <p class="small mt-2 pt-1 mb-0">
               Нет аккаунта?
-              <a class="link-danger" @click="$router.push('/register')">Зарегистрироваться</a>
+              <a href="#" class="link-danger" @click="$router.push('/register')">Зарегистрироваться</a>
             </p>
           </div>
         </div>
@@ -99,6 +106,5 @@ export default {
   </div>
 </template>
 
-<style scoped>
-
+<style>
 </style>

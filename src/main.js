@@ -7,6 +7,7 @@ import 'bootstrap/dist/css/bootstrap.css'
 import 'bootstrap-vue/dist/bootstrap-vue.css'
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
+import './assets/global-styles.css'
 import VueCookies from 'vue-cookies';
 import {globalStorage} from "@/globalStorage";
 
@@ -20,6 +21,12 @@ new Vue({
         return h(App)
     }
 }).$mount('#app');
-Vue.use(BootstrapVue);
+Vue.use(BootstrapVue, {
+    BToast: {
+        noCloseButton: true,
+        toaster: "b-toaster-bottom-right",
+        autoHideDelay: 3000,
+    },
+});
 Vue.use(VueCookies);
 

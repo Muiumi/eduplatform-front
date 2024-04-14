@@ -31,16 +31,20 @@ export default {
       })
           .then(response => {
                 response.json();
+                this.$bvToast.toast("Вы успешно зарегистрировались.", {
+                  variant: "success"
+                })
                 setTimeout(() => {
                   this.$router.push("/auth");
                 }, 3000);
                 console.log(`Пользователь ${this.user.email} зарегистрировался в системе.`)
-                // TODO сделать уведомление для пользователя?
               }
           )
           .catch(exception => {
                 console.error(`Ошибка при регистрации пользователя: ${exception}`);
-                // TODO сделать уведомление для пользователя?
+                this.$bvToast.toast("Произошла ошибка при регистрации, повторите попытку.", {
+                  variant: "danger"
+                })
               }
           )
     }

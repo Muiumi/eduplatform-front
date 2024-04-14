@@ -14,13 +14,16 @@ export default {
   computed: {
     currentCourse() {
       return this.$globalStorage.currentCourse;
+    },
+    currentUser() {
+      return this.$globalStorage.currentUser;
     }
   },
   mounted() {
     fetch(`${this.$eduPlatformApi}/courses/lessons/${this.currentCourse.id}`, {
       method: "GET",
       headers: {
-        "Authorization": `Bearer ${this.$cookies.get("accessToken")}`,
+        "Authorization": `Bearer ${this.currentUser.accessToken}`,
       },
     })
         .then(response => response.json())
@@ -29,12 +32,12 @@ export default {
         })
         .catch((exception => {
               console.error(`Ошибка при получении данных: ${exception}`);
-              // TODO сделать уведомление для пользователя?
+              this.$bvToast.toast("Произошла ошибка при получении данных с сервера.", {
+                variant: "danger"
+              })
             })
         );
   }
-
-
 }
 </script>
 

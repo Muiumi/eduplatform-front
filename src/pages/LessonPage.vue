@@ -29,7 +29,7 @@ export default {
       fetch(`${this.$eduPlatformApi}/tasks/${this.currentLesson.taskId}`, {
         method: "GET",
         headers: {
-          "Authorization": `Bearer ${this.$cookies.get("accessToken")}`,
+          "Authorization": `Bearer ${this.currentUser.accessToken}`,
         },
       })
           .then(response => response.json())
@@ -38,7 +38,9 @@ export default {
           })
           .catch((exception => {
                 console.error(`Ошибка при получении данных: ${exception}`);
-                // TODO сделать уведомление для пользователя?
+                this.$bvToast.toast("Произошла ошибка при получении данных с сервера.", {
+                  variant: "danger"
+                })
               })
           );
     },
@@ -46,7 +48,7 @@ export default {
     getPreviousAnswer() {
       fetch(`${this.$eduPlatformApi}/students/lesson/${this.currentLesson.id}`, {
         headers: {
-          "Authorization": `Bearer ${this.$cookies.get("accessToken")}`,
+          "Authorization": `Bearer ${this.currentUser.accessToken}`,
         },
       })
           .then(response => response.json())
@@ -55,6 +57,9 @@ export default {
           })
           .catch(exception => {
             console.error(`Ошибка при получение заданий пользователя: ${exception}`);
+            this.$bvToast.toast("Произошла ошибка при получении данных с сервера.", {
+              variant: "danger"
+            })
           })
     },
 
@@ -67,13 +72,16 @@ export default {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "Authorization": `Bearer ${this.$cookies.get("accessToken")}`,
+          "Authorization": `Bearer ${this.currentUser.accessToken}`,
         },
         body: JSON.stringify(studentAnswerRequest)
       })
           .then(response => {
             if (response.ok) {
               this.getPreviousAnswer();
+              this.$bvToast.toast("Ответ отправлен на проверку.", {
+                variant: "success"
+              })
               console.log(`Пользователь ${this.currentUser.email} успешно отправил ответ на задание к уроку ${this.currentLesson.id}`)
             } else {
               throw new Error("Ошибка!")
@@ -81,31 +89,45 @@ export default {
           })
           .catch(exception => {
             console.error(`Ошибка при отправке задания пользователя: ${exception}`);
+            this.$bvToast.toast("Произошла ошибка при отправке решения.", {
+              variant: "danger"
+            })
           })
+    },
+
+    changeAnswerWithModal() {
+      this.changeStudentAnswer();
+      this.$refs['changeAnswerModal'].hide();
     },
 
     changeStudentAnswer() {
       const requestToChangeAnswer = {
         studentAnswer: this.studentAnswer,
       };
-      fetch(`${this.$eduPlatformApi}/students/lesson/${this.currentLesson.id}`, {
+      fetch(`${this.$eduPlatformApi}/students/lesson/${this.lastTry.id}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
-          "Authorization": `Bearer ${this.$cookies.get("accessToken")}`,
+          "Authorization": `Bearer ${this.currentUser.accessToken}`,
         },
         body: JSON.stringify(requestToChangeAnswer)
       })
           .then(response => {
             if (response.ok) {
               this.getPreviousAnswer();
+              this.$bvToast.toast("Ответ успешно изменён.", {
+                variant: "success"
+              })
               console.log(`Пользователь ${this.currentUser.email} успешно изменил свой ответ на задание к уроку ${this.currentLesson.id}`)
             } else {
-              throw new Error("Ошибка!")
+              throw new Error("Пользователь не является студентом курса этого урока")
             }
           })
           .catch(exception => {
             console.error(`Ошибка при отправке задания пользователя: ${exception}`);
+            this.$bvToast.toast("Произошла ошибка при изменении ответа. Повторите попытку позже", {
+              variant: "danger"
+            })
           })
     }
 
@@ -129,13 +151,13 @@ export default {
 
     checkIfUserCanChangeHisAnswer() {
       if (!this.checkIfUserCanSendNewAnswer) {
-        return this.lastTry.mentorAnswer == null;
+        return this.lastTry.mentorsAnswer == null || this.lastTry.grade == null;
       }
     },
 
     getStudentGrade() {
       return (this.lastTry == null || this.lastTry.grade == null) ? "Пока не оценено" : this.lastTry.grade;
-    }
+    },
   },
 }
 
@@ -154,16 +176,16 @@ export default {
             <div class="m-3">
               {{ currentLesson.description }}
             </div>
-            <div class="container text-center m-3">
+            <div class="container text-center m-lg-2">
               <button type="button" class="btn btn-primary" @click="isTaskVisible = !isTaskVisible">
                 Посмотреть задание к уроку
               </button>
             </div>
           </div>
-          <div class="container rounded-3 mt-3 p-3 bg-light" v-if="isTaskVisible">
+          <div class="container rounded-3 mt-3 p-lg-3 bg-light" v-if="isTaskVisible">
             <h2 class="display-6 m-3">Задание к уроку</h2>
             <hr>
-            <div class="m-3">
+            <div class="m-lg-3">
               {{ task.description }}
               <div class="mt-3" v-if="checkIfUserCanSendNewAnswer">
                 <label for="studentAnswer" class="form-label">Ваш ответ:</label>
@@ -171,36 +193,38 @@ export default {
                           v-model="studentAnswer">
                 </textarea>
               </div>
-              <div class="d-flex mb-3">
-                <div class="me-auto p-2">
-                  <strong>Оценка:</strong>
+              <div class="d-flex mb-lg-3">
+                <div class="me-auto p-lg-2">
+                  <strong>Текущая оценка:</strong>
                   <p class="display-6 display-7"> {{ getStudentGrade }}</p>
                 </div>
-                <div class="m-3">
-                  <b-button class="btn btn-warning m-2" v-if="checkIfUserCanChangeHisAnswer" @click="showModal">Изменить
-                    ответ
-                  </b-button>
-                  <b-modal ref="changeAnswerModal" title="Измение последнего ответа на урок"
-                           centered ok-only :header-text-variant="'light'" hide-header-close
-                           :header-bg-variant="'primary'">
-                    <span class="form-label">Текущий ответ:</span>
-                    <div class="form-control mt-3 mb-3">
-                      {{ lastTry.studentAnswer }}
-                    </div>
-                    <span class="form-label">Введите новый ответ:</span>
-                    <textarea class="form-control mt-3 mb-3" id="newStudentAnswer" rows="2"
-                              v-model="studentAnswer">
+                <div class="m-lg-3">
+                  <div v-if="checkIfUserCanChangeHisAnswer">
+                    <b-button class="btn btn-warning m-lg-2" @click="showModal">Изменить
+                      ответ
+                    </b-button>
+                    <b-modal ref="changeAnswerModal" title="Измение последнего ответа на урок"
+                             centered ok-only :header-text-variant="'light'" hide-header-close
+                             :header-bg-variant="'primary'">
+                      <span class="form-label">Текущий ответ:</span>
+                      <div class="form-control mt-3 mb-3">
+                        {{ lastTry.studentAnswer }}
+                      </div>
+                      <span class="form-label">Введите новый ответ:</span>
+                      <textarea class="form-control mt-3 mb-3" id="newStudentAnswer" rows="2"
+                                v-model="studentAnswer">
                     </textarea>
-                    <template #modal-footer="{ ok, cancel}">
-                      <b-button size="sm" variant="success" @click="changeStudentAnswer">
-                        Подтвердить изменения
-                      </b-button>
-                      <b-button size="sm" variant="danger" @click="cancel()">
-                        Отмена
-                      </b-button>
-                    </template>
-                  </b-modal>
-                  <button class="btn btn-success m-2" type="button"
+                      <template #modal-footer="{ ok, cancel}">
+                        <b-button size="sm" variant="success" @click="changeAnswerWithModal">
+                          Подтвердить изменения
+                        </b-button>
+                        <b-button size="sm" variant="danger" @click="cancel()">
+                          Отмена
+                        </b-button>
+                      </template>
+                    </b-modal>
+                  </div>
+                  <button class="btn btn-success m-lg-2" type="button"
                           v-if="checkIfUserCanSendNewAnswer" @click="sendStudentAnswer">
                     Отправить на провеку
                   </button>
@@ -225,7 +249,9 @@ export default {
                         Оценка: {{ answer.grade }}
                       </div>
                       <div class="p-2">
-                        Статус: {{ answer.rework }}
+                        <span :class="[(answer.rework) ? 'text-danger': 'text-success']">
+                           Статус: {{ (answer.rework) ? "необходима доработка" : "принято" }}
+                        </span>
                       </div>
                     </div>
                   </div>

@@ -17,12 +17,15 @@ export default {
         fetch(`${this.$eduPlatformApi}/students/start/${courseId}`, {
           method: "POST",
           headers: {
-            "Authorization": `Bearer ${this.$cookies.get("accessToken")}`, //TODO возможно надо вынести повторяющийся код
+            "Authorization": `Bearer ${this.currentUser.accessToken}`,
           }
         })
             .then(response => {
               if (response.ok) {
-                console.info(`Пользователь ${this.$globalStorage.currentUser.email} поступил на курс с ID ${courseId}`);
+                console.info(`Пользователь ${this.currentUser.email} поступил на курс с ID ${courseId}`);
+                this.$bvToast.toast(`Вы поступили на курс ${this.object.title}!`, {
+                  variant: "success"
+                })
                 return response.json();
               } else {
                 throw new Error(`Ошибка при отправлении запроса, статус ${response.status}`);
@@ -38,7 +41,10 @@ export default {
   computed: {
     isCardForCourse() {
       return "category" in this.object;
-    }
+    },
+    currentUser() {
+      return this.$globalStorage.currentUser;
+    },
   }
 }
 
@@ -51,17 +57,14 @@ export default {
     </div>
     <div class="card-body">
       <p class="card-text">{{ object.description }}</p>
-      <div class="row-cols-3 text-center">
+      <div class="row-cols-xxl-3 text-center">
         <a class="btn btn-primary m-1" @click="viewObjectDetails(object.id)">Подробнее</a>
         <a v-if="isCardForCourse" @click="enterOnCourse(object.id)"
-           class="btn btn-success m-1">Записаться на курс</a>
+           class="btn btn-success m-1">Поступить</a>
       </div>
     </div>
-
-
   </div>
 </template>
 
 <style scoped>
-
 </style>
