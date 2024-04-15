@@ -10,34 +10,41 @@ export default {
   mixins: [globalStorageAccess],
   data() {
     return {
-      lessons: []
+      lessons: [],
     }
   },
+
   mounted() {
-    fetch(`${this.$eduPlatformApi}/courses/lessons/${this.currentCourse.id}`, {
-      method: "GET",
-      headers: {
-        "Authorization": `Bearer ${this.currentUser.accessToken}`,
-      },
-    })
-        .then(response => response.json())
-        .then(responseContent => {
-          this.lessons = responseContent;
-        })
-        .catch((exception => {
-              console.error(`Ошибка при получении данных: ${exception}`);
-              this.$bvToast.toast("Произошла ошибка при получении данных с сервера.", {
-                variant: "danger"
+    this.getCourseLessonsById(this.currentCourse.id)
+  },
+
+  methods: {
+    getCourseLessonsById(courseId) {
+      fetch(`${this.$eduPlatformApi}/courses/lessons/${courseId}`, {
+        method: "GET",
+        headers: {
+          "Authorization": `Bearer ${this.currentUser.accessToken}`,
+        },
+      })
+          .then(response => response.json())
+          .then(responseContent => {
+            this.lessons = responseContent;
+          })
+          .catch((exception => {
+                console.error(`Ошибка при получении данных: ${exception}`);
+                this.$bvToast.toast("Произошла ошибка при получении данных с сервера.", {
+                  variant: "danger"
+                })
               })
-            })
-        );
-  }
+          );
+    }
+  },
 }
 </script>
 
 <template>
   <div class="root">
-    <Header></Header>
+    <Header/>
     <div class="row justify-content-center">
       <div class="col-6">
         <div class="container-sm rounded-3 p-3 mb-3 bg-light bg-opacity-25">
@@ -51,7 +58,7 @@ export default {
         </div>
       </div>
     </div>
-    <Footer></Footer>
+    <Footer/>
   </div>
 
 </template>

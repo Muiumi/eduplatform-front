@@ -9,18 +9,29 @@ export default {
   name: "MainPage",
   components: {PlainCard, Footer, Header, SearchPanel},
   mixins: [globalStorageAccess],
-  mounted() {
-    this.getAllCategories();
-    this.showCategoryCourses();
-  },
+
   data() {
     return {
       categories: [],
       courses: [],
-      filteredCourses: [],
+      objectToSearch: '',
       isCategoryChosen: false,
     }
   },
+
+  mounted() {
+    this.getAllCategories();
+    this.showCategoryCourses();
+  },
+
+  watch: {
+    courses(loadedCourses) {
+      this.searchAssist.setItemsToSearch(loadedCourses);
+      this.searchAssist.setSearchResult(loadedCourses);
+      this.findCourse(this.objectToSearch);
+    }
+  },
+
   methods: {
     getAllCategories() {
       fetch(`${this.$eduPlatformApi}/category`, {
@@ -63,11 +74,9 @@ export default {
           )
     },
     findCourse(searchItem) {
-      if (searchItem !== null) {
-        this.filteredCourses = this.courses.filter(course => course.title.toLowerCase().includes(searchItem.toLowerCase()));
-      } else {
-        this.filteredCourses = this.courses;
-      }
+      this.objectToSearch = searchItem;
+      const itemsList = this.searchAssist.itemsToSearch;
+      this.searchAssist.setSearchResult(itemsList.filter(object => object.title.toLowerCase().includes(this.objectToSearch.toLowerCase())));
     }
   },
 }
@@ -76,7 +85,7 @@ export default {
 
 <template>
   <div class="root">
-    <Header></Header>
+    <Header/>
     <div class="row justify-content-center">
       <div class="col-6">
         <div class="container-sm rounded-3 p-3 bg-light bg-opacity-25">
@@ -94,7 +103,7 @@ export default {
           </div>
         </div>
         <div class="container-sm rounded-3 p-3 mt-3 bg-light bg-opacity-25" v-show="isCategoryChosen">
-          <plain-card v-for="(course, index) in filteredCourses"
+          <plain-card v-for="(course, index) in this.searchAssist.searchResult"
                       :key="index" :object="course"
           >
           </plain-card>
@@ -104,7 +113,7 @@ export default {
         <search-panel @search="findCourse"></search-panel>
       </div>
     </div>
-    <Footer></Footer>
+    <Footer/>
   </div>
 </template>
 

@@ -5,14 +5,15 @@ export default {
   name: "PlainCard",
   mixins: [globalStorageAccess],
   props: ['object'],
+
   methods: {
     viewObjectDetails(objectId) {
       if (this.isCardForCourse) {
         Object.assign(this.currentCourse, this.object);
-        this.$router.push({name: "CoursePage", params: {courseId: objectId}});
+        this.$router.push({name: "CoursePage", params: {courseId: this.currentCourse.id}});
       } else {
         Object.assign(this.currentLesson, this.object);
-        this.$router.push({name: "LessonPage", params: {lessonId: objectId}});
+        this.$router.push({name: "LessonPage", params: {lessonId: this.currentLesson.id}});
       }
     },
     enterOnCourse(courseId) {

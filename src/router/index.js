@@ -38,6 +38,14 @@ const routes = [
             requiresToken: true,
         }
     },
+    {
+        path: '/user',
+        name: 'UserAccount',
+        component: () => import("@/pages/UserAccount.vue"),
+        meta: {
+            requiresToken: true,
+        }
+    },
 ]
 
 const router = new VueRouter({

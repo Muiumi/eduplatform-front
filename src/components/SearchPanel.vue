@@ -1,19 +1,23 @@
 <script>
+import {globalStorageAccess} from "@/globalStorageAccess";
+
 export default {
   name: "SearchPanel",
+  mixins: [globalStorageAccess],
+
   data() {
     return {
       objectToSearch: null
     }
 
   },
-  computed: {
-    searchResults() {
+
+  methods: {
+    filterItems() {
       return this.$emit("search", this.objectToSearch);
     }
-  },
+  }
 }
-
 </script>
 
 <template>
@@ -24,9 +28,8 @@ export default {
       <div class="card">
         <div class="m-3">
           <input type="text" class="form-control mb-3" id="exampleFormControlInput1" placeholder="Искомый объект"
-                 v-model="objectToSearch">
+                 v-model="objectToSearch" @input="filterItems">
         </div>
-        <button class="button" @click="searchResults" hidden="hidden"> Поиск</button>
       </div>
     </div>
   </div>

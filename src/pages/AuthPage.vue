@@ -69,7 +69,7 @@ export default {
 
 <template>
   <div class="root background">
-    <Header></Header>
+    <Header/>
     <div class="row justify-content-center text-center">
       <div class="col-sm-5">
         <div class="container-sm rounded-3 p-3 m-3 bg-light bg-opacity-25">
@@ -104,7 +104,7 @@ export default {
         </div>
       </div>
     </div>
-    <Footer></Footer>
+    <Footer/>
   </div>
 </template>
 

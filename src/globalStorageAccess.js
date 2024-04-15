@@ -10,5 +10,8 @@ export const globalStorageAccess = {
         currentLesson() {
             return this.$globalStorage.currentLesson;
         },
+        searchAssist() {
+            return this.$globalStorage.searchAssist;
+        }
     }
 }
