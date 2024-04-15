@@ -3,10 +3,12 @@ import PlainCard from "@/components/PlainCard.vue";
 import Footer from "@/components/Footer.vue";
 import Header from "@/components/Header.vue";
 import LessonTaskCard from "@/components/LessonTaskCard.vue";
+import {globalStorageAccess} from "@/globalStorageAccess";
 
 export default {
   name: "LessonPage",
   components: {LessonTaskCard, Header, Footer, PlainCard},
+  mixins: [globalStorageAccess],
   data() {
     return {
       studentAnswer: "",
@@ -130,17 +132,8 @@ export default {
             })
           })
     }
-
   },
   computed: {
-    currentLesson() {
-      return this.$globalStorage.currentLesson;
-    },
-
-    currentUser() {
-      return this.$globalStorage.currentUser;
-    },
-
     lastTry() {
       return this.previousAnswers.at(-1);
     },

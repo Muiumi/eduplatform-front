@@ -1,10 +1,12 @@
 <script>
 import Header from "@/components/Header.vue";
 import Footer from "@/components/Footer.vue";
+import {globalStorageAccess} from "@/globalStorageAccess";
 
 export default {
   name: "AuthPage",
   components: {Footer, Header},
+  mixins: [globalStorageAccess],
   data() {
     return {
       user: {
@@ -51,7 +53,7 @@ export default {
           )
     },
     parseAuthResponse(content) {
-      let user = this.$globalStorage.currentUser;
+      let user = this.currentUser;
       Object.assign(user, content);
       localStorage.setItem("userData", JSON.stringify(user));
 

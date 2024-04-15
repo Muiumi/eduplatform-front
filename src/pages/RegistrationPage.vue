@@ -4,6 +4,7 @@ import Footer from "@/components/Footer.vue";
 
 export default {
   name: "RegistrationPage",
+  components: {Footer, Header},
   data() {
     return {
       user: {
@@ -49,7 +50,6 @@ export default {
           )
     }
   },
-  components: {Footer, Header}
 }
 </script>
 

@@ -3,33 +3,15 @@ import Header from "@/components/Header.vue";
 import Footer from "@/components/Footer.vue";
 import PlainCard from "@/components/PlainCard.vue";
 import SearchPanel from "@/components/SearchPanel.vue";
+import {globalStorageAccess} from "@/globalStorageAccess";
 
 export default {
   name: "MainPage",
-  components: {
-    PlainCard,
-    Footer,
-    Header,
-    SearchPanel
-  },
+  components: {PlainCard, Footer, Header, SearchPanel},
+  mixins: [globalStorageAccess],
   mounted() {
-    fetch(`${this.$eduPlatformApi}/category`, {
-      method: "GET",
-      headers: {
-        "Authorization": `Bearer ${this.currentUser.accessToken}`,
-      },
-    })
-        .then(response => response.json())
-        .then(data => {
-          this.categories = data
-        })
-        .catch(exception => {
-              console.error(`Ошибка при получении данных: ${exception}`);
-              this.$bvToast.toast("Произошла ошибка при получении данных с сервера.", {
-                variant: "danger"
-              })
-            }
-        )
+    this.getAllCategories();
+    this.showCategoryCourses();
   },
   data() {
     return {
@@ -40,7 +22,26 @@ export default {
     }
   },
   methods: {
-    showCategoryCourses(categoryId) {
+    getAllCategories() {
+      fetch(`${this.$eduPlatformApi}/category`, {
+        method: "GET",
+        headers: {
+          "Authorization": `Bearer ${this.currentUser.accessToken}`,
+        },
+      })
+          .then(response => response.json())
+          .then(data => {
+            this.categories = data
+          })
+          .catch(exception => {
+                console.error(`Ошибка при получении данных: ${exception}`);
+                this.$bvToast.toast("Произошла ошибка при получении данных с сервера.", {
+                  variant: "danger"
+                })
+              }
+          )
+    },
+    showCategoryCourses(categoryId = 1) {
       fetch(`${this.$eduPlatformApi}/category/${categoryId}`, {
         method: "GET",
         headers: {
@@ -62,12 +63,11 @@ export default {
           )
     },
     findCourse(searchItem) {
-      this.filteredCourses = this.courses.filter(course => course.title.toLowerCase().includes(searchItem.toLowerCase()));
-    }
-  },
-  computed: {
-    currentUser() {
-      return this.$globalStorage.currentUser;
+      if (searchItem !== null) {
+        this.filteredCourses = this.courses.filter(course => course.title.toLowerCase().includes(searchItem.toLowerCase()));
+      } else {
+        this.filteredCourses = this.courses;
+      }
     }
   },
 }
@@ -86,8 +86,8 @@ export default {
           <div class="container text-center">
             <div class="row row-cols-lg-4 gap-3 justify-content-center">
               <button class="btn btn-primary" type="button"
-                      v-for="(category, index) in categories"
-                      :key="index" @click="showCategoryCourses(index+1)">
+                      v-for="category in categories"
+                      :key="category.id" @click="showCategoryCourses(category.id)">
                 {{ category.title }}
               </button>
             </div>

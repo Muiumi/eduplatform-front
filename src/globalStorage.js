@@ -33,13 +33,7 @@ export const globalStorage = reactive({
                 this.refreshToken = refresh;
             }
         },
-        currentCourse: null,
-        currentLesson: null,
-        setCurrentCourse(course) {
-            this.currentCourse = course;
-        },
-        setCurrentLesson(lesson) {
-            this.currentLesson = lesson;
-        }
+        currentCourse: {},
+        currentLesson: {},
     }
 )

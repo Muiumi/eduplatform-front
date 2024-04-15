@@ -3,7 +3,7 @@ export default {
   name: "Header",
   methods: {
     goToMain() {
-      if (this.$route.name !== "MainPage") {
+      if (this.$route.name !== "MainPage" && this.$route.name !== "AuthPage" && this.$route.name !== "RegistrationPage") {
         this.$router.push('/');
       }
     }

@@ -3,7 +3,7 @@ export default {
   name: "SearchPanel",
   data() {
     return {
-      objectToSearch: ''
+      objectToSearch: null
     }
 
   },

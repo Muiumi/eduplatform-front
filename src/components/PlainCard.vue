@@ -1,14 +1,17 @@
 <script>
+import {globalStorageAccess} from "@/globalStorageAccess";
+
 export default {
   name: "PlainCard",
+  mixins: [globalStorageAccess],
   props: ['object'],
   methods: {
     viewObjectDetails(objectId) {
       if (this.isCardForCourse) {
-        this.$globalStorage.setCurrentCourse(this.object);
+        Object.assign(this.currentCourse, this.object);
         this.$router.push({name: "CoursePage", params: {courseId: objectId}});
       } else {
-        this.$globalStorage.setCurrentLesson(this.object);
+        Object.assign(this.currentLesson, this.object);
         this.$router.push({name: "LessonPage", params: {lessonId: objectId}});
       }
     },
@@ -41,9 +44,6 @@ export default {
   computed: {
     isCardForCourse() {
       return "category" in this.object;
-    },
-    currentUser() {
-      return this.$globalStorage.currentUser;
     },
   }
 }

@@ -2,21 +2,15 @@
 import Header from "@/components/Header.vue"
 import PlainCard from "@/components/PlainCard.vue";
 import Footer from "@/components/Footer.vue";
+import {globalStorageAccess} from "@/globalStorageAccess";
 
 export default {
   name: "CoursePage",
   components: {Footer, PlainCard, Header},
+  mixins: [globalStorageAccess],
   data() {
     return {
       lessons: []
-    }
-  },
-  computed: {
-    currentCourse() {
-      return this.$globalStorage.currentCourse;
-    },
-    currentUser() {
-      return this.$globalStorage.currentUser;
     }
   },
   mounted() {
