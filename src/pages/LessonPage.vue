@@ -19,8 +19,16 @@ export default {
     }
   },
   beforeMount() {
-    this.getTaskForLesson();
-    this.getPreviousAnswer();
+    if (this.currentLesson.id) {
+      this.getTaskForLesson();
+      this.getPreviousAnswer();
+    } else {
+      const lessonFromSession = JSON.parse(sessionStorage.getItem("currentLesson"));
+      Object.assign(this.currentLesson, lessonFromSession);
+      this.getTaskForLesson();
+      this.getPreviousAnswer();
+    }
+
   },
   methods: {
     showModal() {
@@ -231,7 +239,7 @@ export default {
                 <h4 class="fw-light"> Ваши ответы:</h4>
                 <hr>
                 <div class="border border-primary bg-primary-subtle p-3 rounded-3 mb-3"
-                     v-for="(answer, index) in previousAnswers" :key="index">
+                     v-for="(answer, index) in previousAnswers.reverse()" :key="index">
                   <span class="form-label">Ваш ответ:</span>
                   <div class="form-control mb-2"> {{ answer.studentAnswer }}</div>
                   <div v-if="answer.mentorsAnswer != null && answer.grade != null">

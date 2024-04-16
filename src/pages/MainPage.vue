@@ -14,14 +14,16 @@ export default {
     return {
       categories: [],
       courses: [],
+      userCourses: [],
       objectToSearch: '',
       isCategoryChosen: false,
     }
   },
 
-  mounted() {
+  beforeMount() {
     this.getAllCategories();
     this.showCategoryCourses();
+    this.getUserCourses();
   },
 
   watch: {
@@ -73,6 +75,26 @@ export default {
               )
           )
     },
+
+    getUserCourses() {
+      fetch(`${this.$eduPlatformApi}/users/courses`, {
+        headers: {
+          "Authorization": `Bearer ${this.currentUser.accessToken}`,
+        },
+      })
+          .then(response => response.json())
+          .then(responseContent => {
+            this.userCourses = responseContent;
+          })
+          .catch((exception => {
+                console.error(`Ошибка при получении данных: ${exception}`);
+                this.$bvToast.toast("Произошла ошибка при получении данных с сервера.", {
+                  variant: "danger"
+                })
+              })
+          );
+    },
+
     findCourse(searchItem) {
       this.objectToSearch = searchItem;
       const itemsList = this.searchAssist.itemsToSearch;
@@ -103,8 +125,11 @@ export default {
           </div>
         </div>
         <div class="container-sm rounded-3 p-3 mt-3 bg-light bg-opacity-25" v-show="isCategoryChosen">
-          <plain-card v-for="(course, index) in this.searchAssist.searchResult"
-                      :key="index" :object="course"
+          <plain-card v-for="course in this.searchAssist.searchResult"
+                      :key="course.id"
+                      :object="course"
+                      :user-courses="userCourses"
+                      :only-for-personal-account="false"
           >
           </plain-card>
         </div>

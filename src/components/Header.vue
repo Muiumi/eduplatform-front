@@ -4,13 +4,6 @@ import {globalStorageAccess} from "@/globalStorageAccess";
 export default {
   name: "Header",
   mixins: [globalStorageAccess],
-  methods: {
-    // goToMain() {
-    //   if (this.$route.name !== "MainPage" && this.$route.name !== "AuthPage" && this.$route.name !== "RegistrationPage") {
-    //     this.$router.push('/');
-    //   }
-    // }
-  },
   computed: {
     getUserFullName() {
       return `${this.$globalStorage.currentUser.lastName} ${this.$globalStorage.currentUser.firstName}`;

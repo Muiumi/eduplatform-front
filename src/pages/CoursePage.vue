@@ -14,14 +14,20 @@ export default {
     }
   },
 
-  mounted() {
-    this.getCourseLessonsById(this.currentCourse.id)
+  beforeMount() {
+    if (this.currentCourse.id) {
+      this.getCourseLessonsById(this.currentCourse.id);
+    } else {
+      const courseFromSession = JSON.parse(sessionStorage.getItem("currentCourse"));
+      Object.assign(this.currentCourse, courseFromSession);
+      this.getCourseLessonsById(this.currentCourse.id);
+    }
   },
 
   methods: {
+
     getCourseLessonsById(courseId) {
       fetch(`${this.$eduPlatformApi}/courses/lessons/${courseId}`, {
-        method: "GET",
         headers: {
           "Authorization": `Bearer ${this.currentUser.accessToken}`,
         },
@@ -52,6 +58,7 @@ export default {
           <plain-card v-for="(lesson, index) in lessons"
                       :key="index"
                       :object="lesson"
+                      :only-for-personal-account="false"
           >
           </plain-card>
 
@@ -60,7 +67,6 @@ export default {
     </div>
     <Footer/>
   </div>
-
 </template>
 
 <style scoped>

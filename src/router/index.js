@@ -1,5 +1,6 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
+import {globalStorageAccess} from "@/globalStorageAccess";
 
 Vue.use(VueRouter)
 
@@ -55,12 +56,19 @@ const router = new VueRouter({
 });
 
 const userData = JSON.parse(localStorage.getItem("userData"));
-const expDate = new Date(userData.accessExpiration)
+const expDate = new Date(userData.accessExpiration);
+
 
 router.beforeEach((to, from, next) => {
         if (to.matched.some(route => route.meta.requiresToken)) {
-            if (userData.accessToken == null && expDate > new Date()) {
-                next('auth');
+            if (userData.accessToken == null) {
+                if (to.path !== "/auth") {
+                    next('auth');
+                } else {
+                    next();
+                }
+            } else if (expDate <= new Date()) {
+                next(from.fullPath);
             } else {
                 next();
             }
@@ -68,6 +76,7 @@ router.beforeEach((to, from, next) => {
             next();
         }
     }
+// || expDate <= new Date()
 )
 
 export default router
