@@ -9,6 +9,8 @@ export default {
     const user = this.currentUser;
     const userData = JSON.parse(localStorage.getItem("userData"));
     Object.assign(user, userData);
+    this.currentUser.setAccessToken(this.$cookies.get("accessToken"));
+    this.currentUser.setRefreshToken(this.$cookies.get("refreshToken"));
   },
 }
 </script>

@@ -1,9 +1,10 @@
 import {reactive} from 'vue';
 
-export const ROLE_STUDENT = "ROLE_STUDENT";
-export const ROLE_MENTOR = "ROLE_MENTOR";
-export const ROLE_AUTHOR = "ROLE_AUTHOR";
-
+export const SYSTEM_ROLES = {
+    ROLE_STUDENT: "ROLE_STUDENT",
+    ROLE_MENTOR: "ROLE_MENTOR",
+    ROLE_AUTHOR: "ROLE_AUTHOR",
+}
 export const globalStorage = reactive({
         currentUser: {
             firstName: null,

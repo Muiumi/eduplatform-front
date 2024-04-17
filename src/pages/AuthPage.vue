@@ -53,9 +53,11 @@ export default {
           )
     },
     parseAuthResponse(content) {
-      let user = this.currentUser;
+      const user = this.currentUser;
       Object.assign(user, content);
-      localStorage.setItem("userData", JSON.stringify(user));
+      const {firstName, lastName, email, role} = user;
+      const dataToStore = {firstName, lastName, email, role};
+      localStorage.setItem("userData", JSON.stringify(dataToStore));
 
       const expDateAccess = new Date(content.accessExpiration);
       const expDateRefresh = new Date(content.refreshExpiration);

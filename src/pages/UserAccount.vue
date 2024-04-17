@@ -1,21 +1,26 @@
 <script>
 import Header from "@/components/Header.vue";
 import Footer from "@/components/Footer.vue";
+import {SYSTEM_ROLES} from "@/globalStorage";
 import {globalStorageAccess} from "@/globalStorageAccess";
 import PlainCard from "@/components/PlainCard.vue";
+import StudentAnswerCard from "@/components/StudentAnswerCard.vue";
 
 export default {
   name: "UserAccount",
   mixins: [globalStorageAccess],
-  components: {PlainCard, Footer, Header},
+  components: {StudentAnswerCard, PlainCard, Footer, Header},
   data() {
     return {
       userCourses: [],
+      completedStudentTasks: [],
     }
   },
+
   beforeMount() {
     this.getUserCourses();
   },
+
   methods: {
     getUserCourses() {
       fetch(`${this.$eduPlatformApi}/users/courses`, {
@@ -35,7 +40,30 @@ export default {
               })
           );
     },
-  }
+    getUserAnswers() {
+      fetch(`${this.$eduPlatformApi}/students`, {
+        headers: {
+          "Authorization": `Bearer ${this.currentUser.accessToken}`,
+        },
+      })
+          .then(response => response.json())
+          .then(responseContent => {
+            this.completedStudentTasks = responseContent;
+          })
+          .catch((exception => {
+                console.error(`Ошибка при получении данных: ${exception}`);
+                this.$bvToast.toast("Произошла ошибка при получении данных с сервера.", {
+                  variant: "danger"
+                })
+              })
+          );
+    },
+  },
+  computed: {
+    SYSTEM_ROLES() {
+      return SYSTEM_ROLES
+    }
+  },
 }
 
 </script>
@@ -73,20 +101,24 @@ export default {
                                       :key="course.id"
                                       :object="course"
                                       :only-for-personal-account="true"
-                                      class=""
                           >
                           </plain-card>
                         </b-card-text>
-
                       </b-tab>
-                      <b-tab title="Мои ответы" lazy>
-                        <b-card-text>Tab contents 2</b-card-text>
+                      <b-tab title="Мои ответы" @click="getUserAnswers" lazy>
+                        <b-card-text>
+                          <student-answer-card v-for="task in completedStudentTasks"
+                                               :key="task.id"
+                                               :student-attempt="task"
+                          >
+                          </student-answer-card>
+                        </b-card-text>
                       </b-tab>
                     </b-tabs>
                   </div>
                 </b-card>
               </b-tab>
-              <b-tab title="Я - Ментор">
+              <b-tab title="Я - Ментор" v-if="currentUser.role === SYSTEM_ROLES.ROLE_MENTOR">
                 <div>
                   <b-card class="border border-primary p-3 rounded-3 mb-3" no-body>
                     <b-tabs small pills>

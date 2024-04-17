@@ -1,6 +1,6 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
-import {globalStorageAccess} from "@/globalStorageAccess";
+import {globalStorage} from "@/globalStorage";
 
 Vue.use(VueRouter)
 
@@ -51,32 +51,55 @@ const routes = [
 
 const router = new VueRouter({
     mode: 'history',
-    base: process.env.BASE_URL,
     routes
 });
 
-const userData = JSON.parse(localStorage.getItem("userData"));
-const expDate = new Date(userData.accessExpiration);
-
-
 router.beforeEach((to, from, next) => {
         if (to.matched.some(route => route.meta.requiresToken)) {
-            if (userData.accessToken == null) {
-                if (to.path !== "/auth") {
-                    next('auth');
-                } else {
-                    next();
-                }
-            } else if (expDate <= new Date()) {
-                next(from.fullPath);
-            } else {
+            if (Vue.$cookies.get("accessToken")) {
                 next();
+            } else if (Vue.$cookies.get("refreshToken")) {
+                const refreshTokenRequest = {refreshToken: Vue.$cookies.get("refreshToken")};
+                fetch(`${process.env.VUE_APP_EDU_PLATFORM_API_URL}/auth/refresh-token`, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify(refreshTokenRequest)
+                })
+                    .then(response => {
+                        if (!response.ok) {
+                            console.log(response.json())
+                            next("/auth");
+                        } else {
+                            return response.json();
+                        }
+                    })
+                    .then(responseContent => {
+                        const user = globalStorage.currentUser;
+                        Object.assign(user, responseContent);
+                        user.setAccessToken(responseContent.accessToken);
+
+                        const {firstName, lastName, email, role} = user;
+                        const dataToStore = {firstName, lastName, email, role};
+                        localStorage.setItem("userData", JSON.stringify(dataToStore));
+
+                        const expDateAccess = new Date(responseContent.accessExpiration);
+                        Vue.$cookies.set("accessToken",responseContent.accessToken, expDateAccess);
+                        console.info("JWT токен успешно обновлён");
+                        next();
+                    })
+                    .catch(exception => {
+                        console.error("Возникла ошибка при отправке refresh-токена" + exception);
+                        next("/auth");
+                    })
+            } else {
+                next("/auth");
             }
         } else {
             next();
         }
     }
-// || expDate <= new Date()
 )
 
 export default router

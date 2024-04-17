@@ -2,12 +2,12 @@
 import PlainCard from "@/components/PlainCard.vue";
 import Footer from "@/components/Footer.vue";
 import Header from "@/components/Header.vue";
-import LessonTaskCard from "@/components/LessonTaskCard.vue";
+import StudentAnswerCard from "@/components/StudentAnswerCard.vue";
 import {globalStorageAccess} from "@/globalStorageAccess";
 
 export default {
   name: "LessonPage",
-  components: {LessonTaskCard, Header, Footer, PlainCard},
+  components: {Header, Footer, PlainCard, StudentAnswerCard},
   mixins: [globalStorageAccess],
   data() {
     return {
@@ -156,8 +156,26 @@ export default {
       }
     },
 
+    getFileExtension() {
+      if (this.currentLesson.referenceOnFile) {
+        return this.currentLesson.referenceOnFile.split('.').pop();
+      }
+      return null;
+    },
+
     getStudentGrade() {
       return (this.lastTry == null || this.lastTry.grade == null) ? "Пока не оценено" : this.lastTry.grade;
+    },
+
+    isFileAVideo() {
+      const fileType = this.getFileExtension();
+      return (fileType && (fileType === "mp4" || fileType === "wav"))
+
+    },
+
+    isFileAImage() {
+      const fileType = this.getFileExtension();
+      return (fileType && (fileType === "png" || fileType === "jpg" || fileType === "gif" || fileType === "svg"))
     },
   },
 }
@@ -238,28 +256,11 @@ export default {
               <div v-if="previousAnswers.length > 0">
                 <h4 class="fw-light"> Ваши ответы:</h4>
                 <hr>
-                <div class="border border-primary bg-primary-subtle p-3 rounded-3 mb-3"
-                     v-for="(answer, index) in previousAnswers.reverse()" :key="index">
-                  <span class="form-label">Ваш ответ:</span>
-                  <div class="form-control mb-2"> {{ answer.studentAnswer }}</div>
-                  <div v-if="answer.mentorsAnswer != null && answer.grade != null">
-                    <span class="form-label">Комментарий ментора:</span>
-                    <div class="form-control mb-2"> {{ answer.mentorsAnswer }}</div>
-                    <div class="d-flex">
-                      <div class="me-auto p-2">
-                        Оценка: {{ answer.grade }}
-                      </div>
-                      <div class="p-2">
-                        <span :class="[(answer.rework) ? 'text-danger': 'text-success']">
-                           Статус: {{ (answer.rework) ? "необходима доработка" : "принято" }}
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                  <div class="text-danger" v-else>
-                    Ментор пока не проверил это задание!
-                  </div>
-                </div>
+                <student-answer-card v-for="studentAttempt in previousAnswers"
+                                     :key="studentAttempt.id"
+                                     :student-attempt="studentAttempt"
+                >
+                </student-answer-card>
               </div>
             </div>
           </div>
