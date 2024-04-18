@@ -4,7 +4,21 @@ import {globalStorageAccess} from "@/globalStorageAccess";
 export default {
   name: "Header",
   mixins: [globalStorageAccess],
+  methods: {
+    loggedOut() {
+      this.currentUser.clearCurrentUser();
+      localStorage.removeItem("userData");
+      this.$cookies.remove("accessToken");
+      this.$cookies.remove("refreshToken");
+      this.$router.push("/auth");
+    }
+  },
+
   computed: {
+    isUserLoggedIn() {
+      return this.currentUser.email != null;
+    },
+
     getUserFullName() {
       return `${this.$globalStorage.currentUser.lastName} ${this.$globalStorage.currentUser.firstName}`;
     },
@@ -21,11 +35,17 @@ export default {
           <img src="../assets/logo.png" class="logo" alt="EduPlatform">
           Образовательная платформа
         </router-link>
-        <p>Добро пожаловать, {{ getUserFullName }}</p>
         <div class="navbar-nav">
-          <router-link to="/user" class="nav-link bg-body rounded-3" aria-current="page">
-            Личный кабинет
-          </router-link>
+          <div class="dropdown-center btn-group" v-if="isUserLoggedIn">
+            <router-link to="/user" class="btn btn-primary"> Пользователь {{ getUserFullName }} </router-link>
+            <button type="button" class="btn btn-primary dropdown-toggle dropdown-toggle-split" data-bs-toggle="dropdown" data-bs-display="static" aria-expanded="false">
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end">
+              <router-link to="/user" class="dropdown-item">Личный кабинет</router-link>
+              <li><hr class="dropdown-divider"></li>
+              <li><button class="dropdown-item" @click="loggedOut">Выйти из системы</button></li>
+            </ul>
+          </div>
         </div>
       </div>
     </nav>

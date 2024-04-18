@@ -37,7 +37,7 @@ export default {
           })
           .then(responseContent => {
             this.parseAuthResponse(responseContent);
-            this.$bvToast.toast("Вы успешно авторизовались", {
+            this.$bvToast.toast(`Вы успешно авторизовались как ${this.currentUser.lastName} ${this.currentUser.firstName}`, {
               variant: "success"
             });
             setTimeout(() => {

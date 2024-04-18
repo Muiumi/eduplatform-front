@@ -138,7 +138,7 @@ export default {
             this.$bvToast.toast("Произошла ошибка при изменении ответа. Повторите попытку позже", {
               variant: "danger"
             })
-          })
+          });
     }
   },
   computed: {
@@ -259,6 +259,7 @@ export default {
                 <student-answer-card v-for="studentAttempt in previousAnswers"
                                      :key="studentAttempt.id"
                                      :student-attempt="studentAttempt"
+                                     :for-mentor-review="false"
                 >
                 </student-answer-card>
               </div>

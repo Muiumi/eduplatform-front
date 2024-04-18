@@ -13,12 +13,18 @@ export default {
   data() {
     return {
       userCourses: [],
+      mentorCourses: [],
       completedStudentTasks: [],
+      studentsAnswers: [],
+      onlyNotReviewedAnswers: false,
     }
   },
 
   beforeMount() {
     this.getUserCourses();
+    if (this.currentUser.role === SYSTEM_ROLES.ROLE_MENTOR) {
+      this.getMentorCourses();
+    }
   },
 
   methods: {
@@ -31,6 +37,24 @@ export default {
           .then(response => response.json())
           .then(responseContent => {
             this.userCourses = responseContent;
+          })
+          .catch((exception => {
+                console.error(`Ошибка при получении данных: ${exception}`);
+                this.$bvToast.toast("Произошла ошибка при получении данных с сервера.", {
+                  variant: "danger"
+                })
+              })
+          );
+    },
+    getMentorCourses() {
+      fetch(`${this.$eduPlatformApi}/mentors/courses`, {
+        headers: {
+          "Authorization": `Bearer ${this.currentUser.accessToken}`,
+        },
+      })
+          .then(response => response.json())
+          .then(responseContent => {
+            this.mentorCourses = responseContent;
           })
           .catch((exception => {
                 console.error(`Ошибка при получении данных: ${exception}`);
@@ -58,10 +82,34 @@ export default {
               })
           );
     },
+    getAllStudentsAnswersForAllYourCourses() {
+      fetch(`${this.$eduPlatformApi}/mentors`, {
+        headers: {
+          "Authorization": `Bearer ${this.currentUser.accessToken}`,
+        },
+      })
+          .then(response => response.json())
+          .then(responseContent => {
+            this.studentsAnswers = responseContent;
+          })
+          .catch((exception => {
+                console.error(`Ошибка при получении данных: ${exception}`);
+                this.$bvToast.toast("Произошла ошибка при получении данных с сервера.", {
+                  variant: "danger"
+                })
+              })
+          );
+    },
   },
   computed: {
     SYSTEM_ROLES() {
       return SYSTEM_ROLES
+    },
+    filteredStudentAnswers() {
+      if (this.onlyNotReviewedAnswers) {
+        return this.studentsAnswers.filter(answer => answer.grade == null && answer.mentorAnswer == null);
+      }
+      return this.studentsAnswers;
     }
   },
 }
@@ -76,7 +124,7 @@ export default {
         <div class="d-sm-flex align-items-baseline rounded-3 m-lg-3 bg-light bg-opacity-25">
           <div class="p-3">
             <div class="container bg-light p-4 mt-lg-1 mb-lg-1 rounded-3">
-              <h3>Информация о пользователе</h3>
+              <h3>Пользователь:</h3>
               <div class="border border-primary bg-primary-subtle p-3 rounded-3 mb-3">
                 <span class="form-label">Имя:</span>
                 <div class="form-control mb-2"> {{ this.currentUser.firstName }}</div>
@@ -94,13 +142,14 @@ export default {
               <b-tab title="Я - Студент">
                 <b-card class="border border-primary p-3 rounded-3 mb-3" no-body>
                   <div>
-                    <b-tabs small pills card>
+                    <b-tabs small pills card fill>
                       <b-tab title="Мои курсы" active >
                         <b-card-text>
                           <plain-card v-for="course in userCourses"
                                       :key="course.id"
                                       :object="course"
                                       :only-for-personal-account="true"
+                                      @re
                           >
                           </plain-card>
                         </b-card-text>
@@ -110,6 +159,7 @@ export default {
                           <student-answer-card v-for="task in completedStudentTasks"
                                                :key="task.id"
                                                :student-attempt="task"
+                                               :for-mentor-review="false"
                           >
                           </student-answer-card>
                         </b-card-text>
@@ -121,12 +171,35 @@ export default {
               <b-tab title="Я - Ментор" v-if="currentUser.role === SYSTEM_ROLES.ROLE_MENTOR">
                 <div>
                   <b-card class="border border-primary p-3 rounded-3 mb-3" no-body>
-                    <b-tabs small pills>
-                      <b-tab title="Ответы студентов за все курсы" active>
-                        <b-card-text>Tab contents 1</b-card-text>
+                    <b-tabs small pills card fill>
+                      <b-tab title="Курсы, доступные для менторства" active>
+                        <b-card-text>
+                          <plain-card v-for="course in mentorCourses"
+                                      :key="course.id"
+                                      :object="course"
+                                      :only-for-personal-account="true"
+                          >
+                          </plain-card>
+                        </b-card-text>
                       </b-tab>
-                      <b-tab title="Ответы студентов за все уроки" lazy>
-                        <b-card-text>Tab contents 2</b-card-text>
+                      <b-tab title="Ответы студентов за все курсы" lazy @click="getAllStudentsAnswersForAllYourCourses">
+                        <b-card-text>
+                          <div class="form-check mb-3">
+                            <input class="form-check-input" type="checkbox" id="needToReviewCheckbox"
+                                   v-model="onlyNotReviewedAnswers" @click="onlyNotReviewedAnswers = !onlyNotReviewedAnswers">
+                            <label class="form-check-label" for="needToReviewCheckbox">
+                              Отображать только те задания, которые ещё не были проверены
+                            </label>
+                          </div>
+
+                          <student-answer-card v-for="studentAnswer in filteredStudentAnswers"
+                                               :key="studentAnswer.id"
+                                               :student-attempt="studentAnswer"
+                                               :for-mentor-review="true"
+                                               @review-success="getAllStudentsAnswersForAllYourCourses"
+                          >
+                          </student-answer-card>
+                        </b-card-text>
                       </b-tab>
                     </b-tabs>
                   </b-card>

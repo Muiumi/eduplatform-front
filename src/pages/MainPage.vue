@@ -16,13 +16,13 @@ export default {
       courses: [],
       userCourses: [],
       objectToSearch: '',
-      isCategoryChosen: false,
+      chosenCategoryId: null,
     }
   },
 
   beforeMount() {
     this.getAllCategories();
-    this.showCategoryCourses();
+    this.showCategoryCourses(1);
     this.getUserCourses();
   },
 
@@ -54,7 +54,7 @@ export default {
               }
           )
     },
-    showCategoryCourses(categoryId = 1) {
+    getCategoryCourses(categoryId) {
       fetch(`${this.$eduPlatformApi}/category/${categoryId}`, {
         method: "GET",
         headers: {
@@ -99,6 +99,18 @@ export default {
       this.objectToSearch = searchItem;
       const itemsList = this.searchAssist.itemsToSearch;
       this.searchAssist.setSearchResult(itemsList.filter(object => object.title.toLowerCase().includes(this.objectToSearch.toLowerCase())));
+    },
+
+    isThisCategoryChosen(categoryId) {
+      return this.chosenCategoryId === categoryId;
+    },
+
+    showCategoryCourses(categoryId) {
+      if (this.isThisCategoryChosen(categoryId)) {
+        return;
+      }
+      this.chosenCategoryId = categoryId;
+      this.getCategoryCourses(categoryId);
     }
   },
 }
@@ -116,15 +128,18 @@ export default {
           </div>
           <div class="container text-center">
             <div class="row row-cols-lg-4 gap-3 justify-content-center">
-              <button class="btn btn-primary" type="button"
+              <button type="button"
                       v-for="category in categories"
-                      :key="category.id" @click="showCategoryCourses(category.id)">
+                      :key="category.id"
+                      :disabled="chosenCategoryId === category.id"
+                      :class="[(isThisCategoryChosen(category.id)) ? 'btn btn-outline-primary': 'btn btn-primary']"
+                      @click="showCategoryCourses(category.id)">
                 {{ category.title }}
               </button>
             </div>
           </div>
         </div>
-        <div class="container-sm rounded-3 p-3 mt-3 bg-light bg-opacity-25" v-show="isCategoryChosen">
+        <div class="container-sm rounded-3 p-3 mt-3 bg-light bg-opacity-25" v-show="chosenCategoryId != null">
           <plain-card v-for="course in this.searchAssist.searchResult"
                       :key="course.id"
                       :object="course"

@@ -36,6 +36,12 @@ export const globalStorage = reactive({
 
             setRefreshToken(refresh) {
                 this.refreshToken = refresh;
+            },
+
+            clearCurrentUser() {
+                ["FirstName", "LastName", "Email", "Role", "AccessToken", "RefreshToken"].forEach(key => {
+                    this[`set${key}`](null)
+                });
             }
         },
         searchAssist: {

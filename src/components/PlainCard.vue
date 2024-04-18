@@ -61,7 +61,7 @@ export default {
 </script>
 
 <template>
-  <div class="container bg-light border border-primary mb-3 p-3 rounded-3">
+  <div class="bg-light border border-primary mb-3 p-3 rounded-3">
     <div class="d-flex mb-3">
       <div class="fw-bold me-auto p-2">
         {{ object.title }}
