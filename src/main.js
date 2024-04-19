@@ -12,7 +12,9 @@ import VueCookies from 'vue-cookies';
 import {globalStorage} from "@/globalStorage";
 
 const eduPlatformApi = process.env.VUE_APP_EDU_PLATFORM_API_URL;
+const minioApi = process.env.VUE_APP_EDU_PLATFORM_MINIO_API_URL;
 Vue.prototype.$eduPlatformApi = eduPlatformApi;
+Vue.prototype.$minioApi = minioApi;
 Vue.prototype.$globalStorage = globalStorage;
 
 Vue.use(BootstrapVue, {

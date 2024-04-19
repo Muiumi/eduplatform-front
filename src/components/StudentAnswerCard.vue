@@ -47,7 +47,9 @@ export default {
     },
     sendReviewAndEmitDataUpdate() {
       this.sendMentorReview();
-      return this.$emit("review-success");
+      setTimeout(() => {
+        this.$emit("review-success");
+      }, 2000);
     }
   },
   computed: {

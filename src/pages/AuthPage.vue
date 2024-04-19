@@ -100,7 +100,7 @@ export default {
             </div>
             <p class="small mt-2 pt-1 mb-0">
               Нет аккаунта?
-              <a href="#" class="link-danger" @click="$router.push('/register')">Зарегистрироваться</a>
+              <router-link to="/register" class="link-danger">Зарегистрироваться</router-link>
             </p>
           </div>
         </div>

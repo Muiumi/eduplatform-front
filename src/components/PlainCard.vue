@@ -48,12 +48,13 @@ export default {
       return "category" in this.object;
     },
     checkIfUserEnteredOnCourse() {
-      if (this.userCourses && !this.onlyForPersonalAccount) {
-        return this.userCourses.find(course => course.id === this.object.id);
-      }
+      return this.userCourses && !this.onlyForPersonalAccount && this.userCourses.find(course => course.id === this.object.id);
     },
     isCardForCourseAndUserNotEnteredIt() {
       return !this.onlyForPersonalAccount && this.isCardForCourse && !this.checkIfUserEnteredOnCourse;
+    },
+    cardForLessonOrUserEnteredOnCourse() {
+      return !this.isCardForCourse || this.onlyForPersonalAccount || (!this.onlyForPersonalAccount && this.isCardForCourse && this.checkIfUserEnteredOnCourse);
     }
   }
 }
@@ -73,7 +74,7 @@ export default {
     <div class="card-body">
       <p class="card-text">{{ object.description }}</p>
       <div class="row-cols-xxl-3 text-center">
-        <a class="btn btn-primary m-1" @click="viewObjectDetails()">Подробнее</a>
+        <a class="btn btn-primary m-1" @click="viewObjectDetails()" v-show="cardForLessonOrUserEnteredOnCourse">Подробнее</a>
         <a v-if="isCardForCourseAndUserNotEnteredIt"
            @click="enterOnCourse(object.id)"
            class="btn btn-success m-1">Поступить</a>

@@ -13,22 +13,22 @@ export default {
     return {
       studentAnswer: "",
       mentorAnswer: "",
+      lessonFile: "",
       isTaskVisible: false,
       task: null,
       previousAnswers: [],
     }
   },
   beforeMount() {
-    if (this.currentLesson.id) {
-      this.getTaskForLesson();
-      this.getPreviousAnswer();
-    } else {
+    if (!this.currentLesson.id) {
       const lessonFromSession = JSON.parse(sessionStorage.getItem("currentLesson"));
       Object.assign(this.currentLesson, lessonFromSession);
-      this.getTaskForLesson();
-      this.getPreviousAnswer();
     }
-
+    this.getTaskForLesson();
+    this.getPreviousAnswer();
+    if (this.currentLesson.referenceOnFile) {
+      this.getLessonMaterials();
+    }
   },
   methods: {
     showModal() {
@@ -70,7 +70,7 @@ export default {
             this.$bvToast.toast("Произошла ошибка при получении данных с сервера.", {
               variant: "danger"
             })
-          })
+          });
     },
 
     sendStudentAnswer() {
@@ -94,12 +94,12 @@ export default {
               })
               console.log(`Пользователь ${this.currentUser.email} успешно отправил ответ на задание к уроку ${this.currentLesson.id}`)
             } else {
-              throw new Error("Ошибка!")
+              throw new Error("Некорректный ввод")
             }
           })
           .catch(exception => {
             console.error(`Ошибка при отправке задания пользователя: ${exception}`);
-            this.$bvToast.toast("Произошла ошибка при отправке решения.", {
+            this.$bvToast.toast(`Произошла ошибка при отправке решения: ${exception} `, {
               variant: "danger"
             })
           })
@@ -139,11 +139,40 @@ export default {
               variant: "danger"
             })
           });
-    }
+    },
+
+    getLessonMaterials() {
+      fetch(`${this.$minioApi}/object/${this.currentLesson.referenceOnFile}`, {
+        headers: {
+          "Authorization": `Bearer ${this.currentUser.accessToken}`,
+        },
+      })
+          .then(response => {
+            if (response.ok) {
+              return response.blob();
+            }
+            throw new Error('Ошибка загрузки файла.');
+          })
+          .then(blob => {
+            this.lessonFile = URL.createObjectURL(blob);
+          })
+          .catch(exception => {
+            console.error(`Ошибка при загрузке доп. материалов к уроку: ${exception}`);
+            this.$bvToast.toast("Произошла ошибка при получении данных с сервера.", {
+              variant: "danger"
+            })
+          });
+    },
+    getFileExtension(fileName) {
+      if (fileName) {
+        return fileName.split('.').pop();
+      }
+      return null;
+    },
   },
   computed: {
     lastTry() {
-      return this.previousAnswers.at(-1);
+      return this.previousAnswers[this.previousAnswers.length-1];
     },
 
     checkIfUserCanSendNewAnswer() {
@@ -152,15 +181,8 @@ export default {
 
     checkIfUserCanChangeHisAnswer() {
       if (!this.checkIfUserCanSendNewAnswer) {
-        return this.lastTry.mentorsAnswer == null || this.lastTry.grade == null;
+        return this.lastTry.mentorAnswer == null || this.lastTry.grade == null;
       }
-    },
-
-    getFileExtension() {
-      if (this.currentLesson.referenceOnFile) {
-        return this.currentLesson.referenceOnFile.split('.').pop();
-      }
-      return null;
     },
 
     getStudentGrade() {
@@ -168,13 +190,13 @@ export default {
     },
 
     isFileAVideo() {
-      const fileType = this.getFileExtension();
+      const fileType = this.getFileExtension(this.currentLesson.referenceOnFile);
       return (fileType && (fileType === "mp4" || fileType === "wav"))
 
     },
 
-    isFileAImage() {
-      const fileType = this.getFileExtension();
+    isFileAnImage() {
+      const fileType = this.getFileExtension(this.currentLesson.referenceOnFile);
       return (fileType && (fileType === "png" || fileType === "jpg" || fileType === "gif" || fileType === "svg"))
     },
   },
@@ -194,6 +216,12 @@ export default {
             <hr>
             <div class="m-3">
               {{ currentLesson.description }}
+            </div>
+            <div v-if="isFileAnImage" class="text-center">
+              <img :src="lessonFile" class="img-thumbnail image">
+            </div>
+            <div v-if="isFileAVideo" class="text-center">
+              <video controls :src="lessonFile" class="object-fit-contain video" autoplay></video>
             </div>
             <div class="container text-center m-lg-2">
               <button type="button" class="btn btn-primary" @click="isTaskVisible = !isTaskVisible">
@@ -273,6 +301,14 @@ export default {
 </template>
 
 <style scoped>
+.image {
+  width: 30rem;
+}
+
+.video {
+  width: 50rem;
+}
+
 .display-7 {
   font-size: 1.5rem;
 }

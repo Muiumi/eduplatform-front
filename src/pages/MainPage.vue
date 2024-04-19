@@ -14,7 +14,7 @@ export default {
     return {
       categories: [],
       courses: [],
-      userCourses: [],
+      userCourses: null,
       objectToSearch: '',
       chosenCategoryId: null,
     }
@@ -64,7 +64,6 @@ export default {
           .then(response => response.json())
           .then(data => {
             this.courses = data
-            this.isCategoryChosen = true;
           })
           .catch((exception => {
                     console.error(`Ошибка при получении данных: ${exception}`);
@@ -82,15 +81,22 @@ export default {
           "Authorization": `Bearer ${this.currentUser.accessToken}`,
         },
       })
-          .then(response => response.json())
+          .then(response => {
+            if (response.ok) {
+              console.log(`Пользователь ${this.currentUser.email} получил список курсов, на которые он поступил`);
+              return response.json()
+            } else if (response.status === 404) {
+              this.userCourses = [];
+              throw new Error("Пользователь ещё не поступал на курсы.");
+            } else {
+              throw new Error("Проблемы при получении ответа сервера.");
+            }
+          })
           .then(responseContent => {
-            this.userCourses = responseContent;
+              this.userCourses = responseContent;
           })
           .catch((exception => {
                 console.error(`Ошибка при получении данных: ${exception}`);
-                this.$bvToast.toast("Произошла ошибка при получении данных с сервера.", {
-                  variant: "danger"
-                })
               })
           );
     },

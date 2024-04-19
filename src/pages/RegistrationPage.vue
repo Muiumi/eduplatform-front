@@ -19,7 +19,7 @@ export default {
     register() {
       const signUpRequest = {
         firstName: this.user.firstName,
-        last_name: this.user.lastName,
+        lastName: this.user.lastName,
         email: this.user.email,
         password: this.user.password,
       }
@@ -31,16 +31,18 @@ export default {
         body: JSON.stringify(signUpRequest),
       })
           .then(response => {
-                response.json();
-                this.$bvToast.toast("Вы успешно зарегистрировались.", {
-                  variant: "success"
-                })
-                setTimeout(() => {
-                  this.$router.push("/auth");
-                }, 3000);
-                console.log(`Пользователь ${this.user.email} зарегистрировался в системе.`)
-              }
-          )
+            if (response.ok) {
+              this.$bvToast.toast("Вы успешно зарегистрировались.", {
+                variant: "success"
+              });
+              setTimeout(() => {
+                this.$router.push("/auth");
+              }, 3000);
+              console.log(`Пользователь ${this.user.email} зарегистрировался в системе.`)
+            } else {
+              throw new Error("Некорректный ввод данных");
+            }
+          })
           .catch(exception => {
                 console.error(`Ошибка при регистрации пользователя: ${exception}`);
                 this.$bvToast.toast("Произошла ошибка при регистрации, повторите попытку.", {
@@ -84,7 +86,7 @@ export default {
                 <label for="inputSurname" class="col-form-label">Фамилия:</label>
               </div>
               <div class="col-xxl-3">
-                <input type="text" class="form-control" id="inputSurname" v-model="user.surname">
+                <input type="text" class="form-control" id="inputSurname" v-model="user.lastName">
               </div>
               <div class="col-xxl-2">
                 <label for="inputName" class="col-form-label fw-bold">Имя:</label>
