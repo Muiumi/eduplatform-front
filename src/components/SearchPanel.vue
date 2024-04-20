@@ -9,9 +9,7 @@ export default {
     return {
       objectToSearch: null
     }
-
   },
-
   methods: {
     filterItems() {
       return this.$emit("search", this.objectToSearch);
@@ -21,7 +19,6 @@ export default {
 </script>
 
 <template>
-  <!--TODO Слово ПОИСК не изменяет размеры-->
   <div class="root">
     <div class="container-sm rounded-3 p-3 mb-3 bg-light bg-opacity-25">
       <label for="exampleFormControlInput1" class="form-label text-uppercase fs-2 fw-semibold">Поиск</label>

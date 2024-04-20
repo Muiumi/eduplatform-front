@@ -47,7 +47,7 @@ export default {
             this.categories = data
           })
           .catch(exception => {
-                console.error(`Ошибка при получении данных: ${exception}`);
+                console.error(`Ошибка при получении данных: ${exception.message}`);
                 this.$bvToast.toast("Произошла ошибка при получении данных с сервера.", {
                   variant: "danger"
                 })
@@ -66,7 +66,7 @@ export default {
             this.courses = data
           })
           .catch((exception => {
-                    console.error(`Ошибка при получении данных: ${exception}`);
+                    console.error(`Ошибка при получении данных: ${exception.message}`);
                     this.$bvToast.toast("Произошла ошибка при получении данных с сервера.", {
                       variant: "danger"
                     })
@@ -96,7 +96,7 @@ export default {
               this.userCourses = responseContent;
           })
           .catch((exception => {
-                console.error(`Ошибка при получении данных: ${exception}`);
+                console.error(`Ошибка при получении данных: ${exception.message}`);
               })
           );
     },

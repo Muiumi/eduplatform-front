@@ -37,7 +37,7 @@ export default {
             this.lessons = responseContent;
           })
           .catch((exception => {
-                console.error(`Ошибка при получении данных: ${exception}`);
+                console.error(`Ошибка при получении данных: ${exception.message}`);
                 this.$bvToast.toast("Произошла ошибка при получении данных с сервера.", {
                   variant: "danger"
                 })

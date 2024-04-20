@@ -44,7 +44,7 @@ export default {
             }
           })
           .catch(exception => {
-                console.error(`Ошибка при регистрации пользователя: ${exception}`);
+                console.error(`Ошибка при регистрации пользователя: ${exception.message}`);
                 this.$bvToast.toast("Произошла ошибка при регистрации, повторите попытку.", {
                   variant: "danger"
                 })

@@ -47,7 +47,7 @@ export default {
             this.task = responseContent;
           })
           .catch((exception => {
-                console.error(`Ошибка при получении данных: ${exception}`);
+                console.error(`Ошибка при получении данных: ${exception.message}`);
                 this.$bvToast.toast("Произошла ошибка при получении данных с сервера.", {
                   variant: "danger"
                 })
@@ -66,7 +66,7 @@ export default {
             this.previousAnswers = responseContent;
           })
           .catch(exception => {
-            console.error(`Ошибка при получение заданий пользователя: ${exception}`);
+            console.error(`Ошибка при получение заданий пользователя: ${exception.message}`);
             this.$bvToast.toast("Произошла ошибка при получении данных с сервера.", {
               variant: "danger"
             })
@@ -98,8 +98,8 @@ export default {
             }
           })
           .catch(exception => {
-            console.error(`Ошибка при отправке задания пользователя: ${exception}`);
-            this.$bvToast.toast(`Произошла ошибка при отправке решения: ${exception} `, {
+            console.error(`Ошибка при отправке задания пользователя: ${exception.message}`);
+            this.$bvToast.toast(`Произошла ошибка при отправке решения: ${exception.message} `, {
               variant: "danger"
             })
           })
@@ -134,7 +134,7 @@ export default {
             }
           })
           .catch(exception => {
-            console.error(`Ошибка при отправке задания пользователя: ${exception}`);
+            console.error(`Ошибка при отправке задания пользователя: ${exception.message}`);
             this.$bvToast.toast("Произошла ошибка при изменении ответа. Повторите попытку позже", {
               variant: "danger"
             })
@@ -157,7 +157,7 @@ export default {
             this.lessonFile = URL.createObjectURL(blob);
           })
           .catch(exception => {
-            console.error(`Ошибка при загрузке доп. материалов к уроку: ${exception}`);
+            console.error(`Ошибка при загрузке доп. материалов к уроку: ${exception.message}`);
             this.$bvToast.toast("Произошла ошибка при получении данных с сервера.", {
               variant: "danger"
             })

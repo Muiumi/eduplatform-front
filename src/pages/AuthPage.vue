@@ -48,7 +48,7 @@ export default {
                 this.$bvToast.toast("Неверные почта или пароль, проверьте вводимые данные и попробуйте снова.", {
                   variant: "danger"
                 })
-                console.error(`Ошибка при авторизации пользователя: ${exception}`);
+                console.error(`Ошибка при авторизации пользователя: ${exception.message}`);
               }
           )
     },

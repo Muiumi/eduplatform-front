@@ -37,7 +37,7 @@ export default {
               }
             })
             .catch(exception => {
-                  console.error(`Ошибка при получении данных: ${exception}`);
+                  console.error(`Ошибка при получении данных: ${exception.message}`);
                 }
             )
       }

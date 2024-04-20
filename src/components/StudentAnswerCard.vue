@@ -39,7 +39,7 @@ export default {
             }
           })
           .catch(exception => {
-            console.error(`Ошибка при проверке задания студента: ${exception}`);
+            console.error(`Ошибка при проверке задания студента: ${exception.message}`);
             this.$bvToast.toast("Произошла ошибка при проверке. Повторите попытку позже", {
               variant: "danger"
             })
